@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Eirflux Logo Editor</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 40px 20px; font: 16px system-ui, sans-serif; color: #172033; background: #f3f5f8; }
+    main { max-width: 760px; margin: auto; }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    p { color: #667085; margin: 0 0 24px; }
+    .preview { min-height: 320px; padding: 32px; display: grid; place-items: center; overflow: auto; border: 1px solid #d9dee8; border-radius: 16px; background-color: #e5e7eb; background-image: linear-gradient(45deg,#fff 25%,transparent 25%),linear-gradient(-45deg,#fff 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#fff 75%),linear-gradient(-45deg,transparent 75%,#fff 75%); background-size: 24px 24px; background-position: 0 0,0 12px,12px -12px,-12px 0; }
+    canvas { display: block; max-width: 100%; height: auto; }
+    #logo-source { display: none; }
+    form { margin-top: 20px; padding: 24px; background: white; border: 1px solid #d9dee8; border-radius: 16px; }
+    fieldset { border: 0; padding: 0; margin: 0 0 24px; }
+    legend, .label { display: block; font-weight: 600; margin-bottom: 12px; }
+    .colors { display: flex; gap: 16px; flex-wrap: nowrap; align-items: center; overflow-x: auto; }
+    .colors label { display: flex; align-items: center; gap: 6px; }
+    .hex-control { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+    .colors > label { flex-shrink: 0; }
+    .hex-control label, .hex-control .hint { white-space: nowrap; }
+    .hex-control .hint { margin: 0; font-size: 12px; }
+    .gradient-option, .stop-row { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+    .gradient-option label { display: flex; align-items: center; gap: 6px; }
+    .stop-row label { min-width: 55px; }
+    .height-controls { display: flex; align-items: center; gap: 16px; }
+    .height-controls input[type=range] { flex: 1; min-width: 0; accent-color: #2563eb; }
+    input[type=text], input[type=number] { padding: 10px 12px; border: 1px solid #aab3c2; border-radius: 7px; font: inherit; width: 150px; }
+    input:focus-visible { outline: 3px solid #b6d1ff; outline-offset: 2px; }
+    .hint { font-size: 14px; margin: 10px 0 0; }
+    #status { margin-top: 16px; font-size: 14px; color: #667085; }
+    #error { color: #b42318; margin: 12px 0 0; }
+    .downloads { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+    button { padding: 11px 18px; border: 0; border-radius: 7px; background: #2563eb; color: white; font: inherit; font-weight: 600; cursor: pointer; }
+    button:disabled { opacity: .45; cursor: default; }
+    button:focus-visible { outline: 3px solid #b6d1ff; outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Eirflux Logo Editor</h1>
+    <div class="preview"><canvas id="preview" aria-label="Logo preview"></canvas></div>
+    <div id="status" role="status"></div>
+    <form id="controls" novalidate>
+      <fieldset>
+        <legend>Logo color</legend>
+        <div class="colors">
+          <label><input type="radio" name="color" value="#000000" checked> Black</label>
+          <label><input type="radio" name="color" value="#ffffff"> White</label>
+          <div class="hex-control">
+            <label><input type="radio" name="color" value="custom"> Custom</label>
+            <input id="hex" type="text" value="#000000" placeholder="#000000 or red" aria-label="Custom color" aria-describedby="hex-hint" spellcheck="false">
+            <p id="hex-hint" class="hint">Color name or 3/6-digit hex (# optional).</p>
+          </div>
+        </div>
+        <div class="gradient-option">
+          <label><input type="radio" name="color" value="gradient"> Gradient</label>
+          <button id="add-stop" type="button">Add Stop</button>
+        </div>
+        <div id="gradient-stops"></div>
+        <p class="hint">Gradient stops run from left to right, evenly spaced. Add two or more colors for a gradient.</p>
+      </fieldset>
+      <label class="label" for="height">Height (pixels)</label>
+      <div class="height-controls">
+        <input id="height" type="number" value="160" min="1" max="2048" step="1" inputmode="numeric">
+        <input id="height-slider" type="range" value="160" min="1" max="2048" step="1" aria-label="Logo height in pixels">
+      </div>
+      <p class="hint">1–2048 pixels. Width adjusts automatically. Large logos scale to fit the preview.</p>
+      <p id="error" role="alert" hidden></p>
+      <div class="downloads">
+        <button id="download-svg" type="button" disabled>Download SVG</button>
+        <button id="download-png" type="button" disabled>Download PNG</button>
+      </div>
+    </form>
+  </main>
+
+  <!-- Replace this sample SVG with your logo. Keep a viewBox defining its aspect ratio. -->
+  <svg id="logo-source" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 160" hidden>
+    <path fill="#000" d="M20 80 60 10h80l40 70-40 70H60Zm43 0 22 38h30l22-38-22-38H85Z" fill-rule="evenodd"/>
+    <path fill="#000" d="M200 35h24v66h76v24H200Z"/>
+  </svg>
+  <script>
+    const source = document.getElementById('logo-source');
+    const canvas = document.getElementById('preview');
+    const context = canvas.getContext('2d');
+    const controls = document.getElementById('controls');
+    const hex = document.getElementById('hex');
+    const heightInput = document.getElementById('height');
+    const heightSlider = document.getElementById('height-slider');
+    const error = document.getElementById('error');
+    const status = document.getElementById('status');
+    const aspectRatio = source.viewBox.baseVal.width / source.viewBox.baseVal.height;
+    let revision = 0;
+    const svgButton = document.getElementById('download-svg');
+    const pngButton = document.getElementById('download-png');
+    let exportSvg = null;
+    const stopsContainer = document.getElementById('gradient-stops');
+    const rainbow = ['#ff0000', '#ff7f00', '#ffff00', '#00bf63', '#0080ff', '#4b0082', '#9400d3'];
+    function parseColor(value) {
+      const text = value.trim().toLowerCase();
+      if (/^#?(?:[\da-f]{3}|[\da-f]{6})$/i.test(text)) return '#' + text.replace(/^#/, '');
+      if (/^[a-z]+$/.test(text) && !['inherit', 'initial', 'unset', 'revert', 'currentcolor'].includes(text) && CSS.supports('color', text)) return text;
+      return null;
+    }
+    document.getElementById('add-stop').addEventListener('click', () => {
+      const index = stopsContainer.children.length;
+      const row = document.createElement('div');
+      row.className = 'stop-row';
+      const label = document.createElement('label');
+      label.htmlFor = `stop-${index}`;
+      label.textContent = `Stop ${index + 1}`;
+      const input = document.createElement('input');
+      input.id = label.htmlFor;
+      input.type = 'text';
+      input.value = rainbow[index % rainbow.length];
+      input.placeholder = '#ff0000 or red';
+      input.spellcheck = false;
+      row.append(label, input);
+      stopsContainer.appendChild(row);
+      controls.querySelector('[value="gradient"]').checked = true;
+      render();
+      input.focus();
+    });
+
+    function download(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+    svgButton.addEventListener('click', () => {
+      if (exportSvg && !svgButton.disabled) download(exportSvg, 'logo.svg');
+    });
+    pngButton.addEventListener('click', () => {
+      if (pngButton.disabled) return;
+      canvas.toBlob(blob => {
+        if (blob) download(blob, 'logo.png');
+        else { error.textContent = 'The PNG could not be created.'; error.hidden = false; }
+      }, 'image/png');
+    });
+
+    async function render() {
+      const currentRevision = ++revision;
+      svgButton.disabled = pngButton.disabled = true;
+      exportSvg = null;
+      const selected = controls.elements.color.value;
+      const custom = parseColor(hex.value);
+      const height = Number(heightInput.value);
+      const stopInputs = [...stopsContainer.querySelectorAll('input')];
+      const stopColors = stopInputs.map(input => parseColor(input.value));
+      let message = '';
+      if (selected === 'custom' && !custom) message = 'Enter a valid color name or 3- or 6-digit hex color.';
+      else if (selected === 'gradient' && !stopInputs.length) message = 'Click Add Stop to add a gradient color.';
+      else if (selected === 'gradient' && stopColors.some(color => !color)) message = 'Enter a valid color name or 3- or 6-digit hex color for each gradient stop.';
+      else if (!Number.isInteger(height) || height < 1 || height > 2048) message = 'Enter a whole-number height between 1 and 2048.';
+      error.textContent = message;
+      error.hidden = !message;
+      hex.setAttribute('aria-invalid', String(selected === 'custom' && !custom));
+      heightInput.setAttribute('aria-invalid', String(!Number.isInteger(height) || height < 1 || height > 2048));
+      stopInputs.forEach((input, index) => input.setAttribute('aria-invalid', String(selected === 'gradient' && !stopColors[index])));
+      if (message) return;
+      const color = selected === 'custom' ? custom : selected;
+      const width = Math.max(1, Math.round(height * aspectRatio));
+      const svg = source.cloneNode(true);
+      svg.removeAttribute('hidden');
+      svg.removeAttribute('id');
+      svg.setAttribute('width', width);
+      svg.setAttribute('height', height);
+      // Use the logo's alpha as a mask for both solid and gradient vector fills.
+      const ns = 'http://www.w3.org/2000/svg';
+      const group = document.createElementNS(ns, 'g');
+      while (svg.firstChild) group.appendChild(svg.firstChild);
+      const defs = document.createElementNS(ns, 'defs');
+      const box = source.viewBox.baseVal;
+      const mask = document.createElementNS(ns, 'mask');
+      mask.setAttribute('id', 'logo-export-mask');
+      mask.setAttribute('maskUnits', 'userSpaceOnUse');
+      mask.setAttribute('maskContentUnits', 'userSpaceOnUse');
+      mask.setAttribute('style', 'mask-type: alpha');
+      const paint = document.createElementNS(ns, 'rect');
+      for (const [name, value] of Object.entries({ x: box.x, y: box.y, width: box.width, height: box.height })) {
+        mask.setAttribute(name, value);
+        paint.setAttribute(name, value);
+      }
+      mask.appendChild(group);
+      defs.appendChild(mask);
+      paint.setAttribute('mask', 'url(#logo-export-mask)');
+      if (selected === 'gradient') {
+        const gradient = document.createElementNS(ns, 'linearGradient');
+        gradient.setAttribute('id', 'logo-export-gradient');
+        gradient.setAttribute('gradientUnits', 'userSpaceOnUse');
+        gradient.setAttribute('x1', box.x);
+        gradient.setAttribute('x2', box.x + box.width);
+        gradient.setAttribute('y1', box.y);
+        gradient.setAttribute('y2', box.y);
+        gradient.setAttribute('color-interpolation', 'sRGB');
+        stopColors.forEach((stopColor, index) => {
+          const stop = document.createElementNS(ns, 'stop');
+          stop.setAttribute('offset', stopColors.length === 1 ? 0 : index / (stopColors.length - 1));
+          stop.setAttribute('stop-color', stopColor);
+          gradient.appendChild(stop);
+        });
+        defs.appendChild(gradient);
+        paint.setAttribute('fill', 'url(#logo-export-gradient)');
+      } else paint.setAttribute('fill', color);
+      svg.append(defs, paint);
+      const svgBlob = new Blob([new XMLSerializer().serializeToString(svg)], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(svgBlob);
+      const image = new Image();
+      try {
+        await new Promise((resolve, reject) => { image.onload = resolve; image.onerror = reject; image.src = url; });
+        if (currentRevision !== revision) return;
+        canvas.width = width;
+        canvas.height = height;
+        context.drawImage(image, 0, 0, width, height);
+        status.textContent = `${width} × ${height} px · ${selected === 'gradient' ? 'Horizontal gradient' : color.toUpperCase()}`;
+        exportSvg = svgBlob;
+        svgButton.disabled = pngButton.disabled = false;
+      } catch {
+        if (currentRevision === revision) { error.textContent = 'The SVG could not be loaded.'; error.hidden = false; }
+      } finally { URL.revokeObjectURL(url); }
+    }
+    controls.addEventListener('submit', event => event.preventDefault());
+    controls.addEventListener('input', event => {
+      if (event.target === heightSlider) heightInput.value = heightSlider.value;
+      if (event.target === heightInput && heightInput.validity.valid && heightInput.value !== '') heightSlider.value = heightInput.value;
+      if (event.target === hex) controls.querySelector('[value="custom"]').checked = true;
+      if (stopsContainer.contains(event.target)) controls.querySelector('[value="gradient"]').checked = true;
+      render();
+    });
+    render();
+  </script>
+</body>
+</html>
