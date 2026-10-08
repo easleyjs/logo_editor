@@ -10,8 +10,8 @@
     main { max-width: 760px; margin: auto; }
     h1 { margin: 0 0 8px; font-size: 28px; }
     p { color: #667085; margin: 0 0 24px; }
-    .preview { min-height: 320px; padding: 32px; display: grid; place-items: center; overflow: auto; border: 1px solid #d9dee8; border-radius: 16px; background-color: #e5e7eb; background-image: linear-gradient(45deg,#fff 25%,transparent 25%),linear-gradient(-45deg,#fff 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#fff 75%),linear-gradient(-45deg,transparent 75%,#fff 75%); background-size: 24px 24px; background-position: 0 0,0 12px,12px -12px,-12px 0; }
-    canvas { display: block; max-width: 100%; height: auto; }
+    .preview { height: 464px; min-height: 320px; max-height: 70vh; min-width: 0; padding: 32px; display: grid; place-items: safe center; overflow: auto; border: 1px solid #d9dee8; border-radius: 16px; background-color: #e5e7eb; background-image: linear-gradient(45deg,#fff 25%,transparent 25%),linear-gradient(-45deg,#fff 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#fff 75%),linear-gradient(-45deg,transparent 75%,#fff 75%); background-size: 24px 24px; background-position: 0 0,0 12px,12px -12px,-12px 0; }
+    canvas { display: block; height: auto; }
     #logo-source { display: none; }
     form { margin-top: 20px; padding: 24px; background: white; border: 1px solid #d9dee8; border-radius: 16px; }
     fieldset { border: 0; padding: 0; margin: 0 0 24px; }
@@ -46,6 +46,13 @@
     <div id="status" role="status"></div>
     <form id="controls" novalidate>
       <fieldset>
+        <legend>Logo type</legend>
+        <div class="colors">
+          <label><input type="radio" name="logoType" value="full" checked> Full Logo</label>
+          <label><input type="radio" name="logoType" value="text"> Text</label>
+        </div>
+      </fieldset>
+      <fieldset>
         <legend>Logo color</legend>
         <div class="colors">
           <label><input type="radio" name="color" value="#000000" checked> Black</label>
@@ -65,10 +72,10 @@
       </fieldset>
       <label class="label" for="height">Height (pixels)</label>
       <div class="height-controls">
-        <input id="height" type="number" value="160" min="1" max="2048" step="1" inputmode="numeric">
-        <input id="height-slider" type="range" value="160" min="1" max="2048" step="1" aria-label="Logo height in pixels">
+        <input id="height" type="number" value="400" min="1" max="8192" step="1" inputmode="numeric">
+        <input id="height-slider" type="range" value="400" min="1" max="8192" step="1" aria-label="Logo height in pixels">
       </div>
-      <p class="hint">1–2048 pixels. Width adjusts automatically. Large logos scale to fit the preview.</p>
+      <p class="hint">1–8192 pixels. Width adjusts automatically. Scroll the preview to see large logos at their full size.</p>
       <p id="error" role="alert" hidden></p>
       <div class="downloads">
         <button id="download-svg" type="button" disabled>Download SVG</button>
@@ -99,8 +106,51 @@
 </g>
 </g>
 </svg>
+  <template id="text-source">
+<svg
+   version="1.1"
+   width="1280"
+   height="1024"
+   viewBox="0 0 1280 1024"
+   xml:space="preserve"
+   id="svg152"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+<desc
+   id="desc132">Created with Fabric.js 5.3.0</desc>
+<defs
+   id="defs134">
+</defs>
+
+
+<g
+   transform="matrix(1.9211538461538462 0 0 1.9211538461538462 643.1601689119647 689.4827751360552)"
+   id="text-logo">
+<g
+   style=""
+   paint-order="stroke"
+   id="g149">
+		<g
+   transform="matrix(1 0 0 1 0 0)"
+   id="text-logo-path-0">
+<path
+   style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;"
+   paint-order="stroke"
+   transform=" translate(-113.69500000000001, 22.249387801702444)"
+   d="M 29.18 -0.26 L 29.18 -7.94 C 23.04 -7.81 16.77 -7.74 10.18 -7.55 L 10.11 -12.54 C 14.66 -12.74 19.46 -12.99 23.94 -13.31 L 23.42 -20.99 C 18.94 -20.67 14.46 -20.42 10.05 -20.22 L 9.73 -37.44 C 15.81 -37.44 20.35 -37.31 29.44 -36.74 L 29.44 -44.42 C 16.96 -45.25 12.93 -45.12 1.92 -45.12 C 2.3 -27.07 2.43 -12.86 2.5 0.38 C 11.78 0.06 20.74 -0.13 29.18 -0.26 Z M 43.26 -12.74 L 50.94 -12.48 C 51.2 -20.48 51.26 -34.18 51.26 -44.74 L 43.58 -44.74 C 43.58 -34.18 43.52 -20.74 43.26 -12.74 Z M 46.98 1.09 L 52.74 -4.03 C 51.39 -5.57 49.15 -8 47.81 -9.6 L 41.92 -4.61 C 43.33 -2.94 45.63 -0.45 46.98 1.09 Z M 83.14 -12.61 L 90.82 -12.99 C 90.5 -18.69 88 -22.91 85.06 -25.86 C 87.94 -27.71 89.66 -30.53 89.66 -34.56 C 89.66 -45.44 77.31 -46.4 65.47 -45.18 C 65.54 -35.52 65.22 -24.13 65.22 -12.61 L 72.9 -12.61 L 72.96 -23.17 C 73.92 -23.1 74.88 -23.17 75.71 -23.17 C 78.78 -21.76 82.82 -18.24 83.14 -12.61 Z M 86.46 -0.13 L 86.59 -7.81 L 67.71 -8 L 67.58 -0.32 Z M 73.09 -30.85 L 73.15 -37.95 C 78.46 -38.02 81.98 -37.18 81.98 -34.56 C 81.98 -31.62 78.08 -30.66 73.09 -30.85 Z M 129.22 -36.74 L 129.34 -44.42 C 118.85 -44.54 109.82 -44.35 101.82 -43.78 C 101.7 -27.84 102.66 -12.22 102.34 -0.51 L 110.02 -0.26 C 110.14 -4.03 110.14 -8 110.02 -12.29 C 114.5 -12.42 119.23 -12.67 123.9 -13.12 L 123.14 -20.8 C 118.59 -20.35 114.24 -20.1 109.89 -19.97 C 109.7 -25.34 109.57 -30.85 109.5 -36.54 C 115.52 -36.8 121.86 -36.86 129.22 -36.74 Z M 140.29 0 L 147.97 0 C 147.9 -11.14 148.42 -30.14 148.1 -44.8 L 140.42 -44.8 C 140.74 -30.4 140.22 -11.14 140.29 0 Z M 166.91 -44.86 L 159.23 -44.74 C 159.42 -35.58 159.55 -30.34 159.49 -24.7 C 159.49 -16.19 166.53 -11.52 172.35 -11.52 C 179.01 -11.52 184.83 -17.09 184.9 -23.81 C 185.15 -31.55 185.22 -33.41 184.83 -43.9 L 177.15 -43.65 C 177.54 -33.28 177.47 -31.68 177.22 -23.94 C 177.28 -21.44 174.91 -19.2 172.35 -19.2 C 170.37 -19.2 167.17 -20.86 167.17 -24.7 C 167.23 -30.34 167.1 -35.71 166.91 -44.86 Z M 171.84 1.09 L 177.6 -4.03 C 176.26 -5.57 174.02 -8 172.67 -9.6 L 166.78 -4.61 C 168.19 -2.94 170.5 -0.45 171.84 1.09 Z M 219.97 -11.39 L 225.47 -16.64 C 222.08 -20.16 218.69 -23.94 215.42 -27.9 C 218.37 -32.26 220.99 -36.61 223.42 -41.02 L 216.64 -44.74 C 214.72 -41.22 212.61 -37.63 210.37 -34.24 C 207.62 -37.95 204.99 -41.73 202.62 -45.57 L 196.1 -41.47 C 199.04 -36.74 202.3 -32.13 205.76 -27.65 C 203.01 -23.94 199.87 -20.16 196.54 -16.64 L 202.18 -11.39 C 205.25 -14.66 208.06 -17.98 210.82 -21.57 C 213.76 -18.05 216.9 -14.59 219.97 -11.39 Z M 222.02 -0.13 L 222.14 -7.81 L 200.06 -8 L 199.94 -0.32 Z"
+   stroke-linecap="round"
+   id="path146" />
+</g>
+</g>
+</g>
+</svg>
+
+  </template>
   <script>
-    const source = document.getElementById('logo-source');
+    const sources = {
+      full: document.getElementById('logo-source'),
+      text: document.getElementById('text-source').content.querySelector('svg')
+    };
     const canvas = document.getElementById('preview');
     const context = canvas.getContext('2d');
     const controls = document.getElementById('controls');
@@ -109,8 +159,8 @@
     const heightSlider = document.getElementById('height-slider');
     const error = document.getElementById('error');
     const status = document.getElementById('status');
-    const aspectRatio = source.viewBox.baseVal.width / source.viewBox.baseVal.height;
-    function measureArtwork() {
+
+    function measureArtwork(source) {
       const measurement = source.cloneNode(true);
       measurement.removeAttribute('id');
       measurement.removeAttribute('hidden');
@@ -128,7 +178,7 @@
         measurement.remove();
       }
     }
-    const artworkBounds = measureArtwork();
+    const boundsByType = Object.fromEntries(Object.entries(sources).map(([type, source]) => [type, measureArtwork(source)]));
     let revision = 0;
     const svgButton = document.getElementById('download-svg');
     const pngButton = document.getElementById('download-png');
@@ -186,6 +236,10 @@
       const currentRevision = ++revision;
       svgButton.disabled = pngButton.disabled = true;
       exportSvg = null;
+      const logoType = controls.elements.logoType.value;
+      const source = sources[logoType];
+      const artworkBounds = boundsByType[logoType];
+      const aspectRatio = source.viewBox.baseVal.width / source.viewBox.baseVal.height;
       const selected = controls.elements.color.value;
       const custom = parseColor(hex.value);
       const height = Number(heightInput.value);
@@ -195,11 +249,11 @@
       if (selected === 'custom' && !custom) message = 'Enter a valid color name or 3- or 6-digit hex color.';
       else if (selected === 'gradient' && !stopInputs.length) message = 'Click Add Stop to add a gradient color.';
       else if (selected === 'gradient' && stopColors.some(color => !color)) message = 'Enter a valid color name or 3- or 6-digit hex color for each gradient stop.';
-      else if (!Number.isInteger(height) || height < 1 || height > 2048) message = 'Enter a whole-number height between 1 and 2048.';
+      else if (!Number.isInteger(height) || height < 1 || height > 8192) message = 'Enter a whole-number height between 1 and 8192.';
       error.textContent = message;
       error.hidden = !message;
       hex.setAttribute('aria-invalid', String(selected === 'custom' && !custom));
-      heightInput.setAttribute('aria-invalid', String(!Number.isInteger(height) || height < 1 || height > 2048));
+      heightInput.setAttribute('aria-invalid', String(!Number.isInteger(height) || height < 1 || height > 8192));
       stopInputs.forEach((input, index) => input.setAttribute('aria-invalid', String(selected === 'gradient' && !stopColors[index])));
       if (message) return;
       const color = selected === 'custom' ? custom : selected;
@@ -214,7 +268,18 @@
       const group = document.createElementNS(ns, 'g');
       while (svg.firstChild) group.appendChild(svg.firstChild);
       const defs = document.createElementNS(ns, 'defs');
-      const box = source.viewBox.baseVal;
+      // Apply two successive 25% reductions, preserving the original center and aspect ratio.
+      const originalBox = source.viewBox.baseVal;
+      const box = {
+        x: originalBox.x + originalBox.width * 0.21875,
+        y: originalBox.y + originalBox.height * 0.21875,
+        width: originalBox.width * 0.5625,
+        height: originalBox.height * 0.5625
+      };
+      svg.setAttribute('viewBox', `${box.x} ${box.y} ${box.width} ${box.height}`);
+      const offsetX = box.x + box.width / 2 - (artworkBounds.x + artworkBounds.width / 2);
+      const offsetY = box.y + box.height / 2 - (artworkBounds.y + artworkBounds.height / 2);
+      group.setAttribute('transform', `translate(${offsetX} ${offsetY})`);
       const mask = document.createElementNS(ns, 'mask');
       mask.setAttribute('id', 'logo-export-mask');
       mask.setAttribute('maskUnits', 'userSpaceOnUse');
@@ -232,8 +297,8 @@
         const gradient = document.createElementNS(ns, 'linearGradient');
         gradient.setAttribute('id', 'logo-export-gradient');
         gradient.setAttribute('gradientUnits', 'userSpaceOnUse');
-        gradient.setAttribute('x1', artworkBounds.x);
-        gradient.setAttribute('x2', artworkBounds.x + artworkBounds.width);
+        gradient.setAttribute('x1', artworkBounds.x + offsetX);
+        gradient.setAttribute('x2', artworkBounds.x + artworkBounds.width + offsetX);
         gradient.setAttribute('y1', box.y);
         gradient.setAttribute('y2', box.y);
         gradient.setAttribute('color-interpolation', 'sRGB');
